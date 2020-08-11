@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" dir=>
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Postgres #  The purpose of this guide is to get you started with Red Sky Ops and Postgres. We will cover
+ Deploying a postgres to Kubernetes Exploring the postgres experiment Running trials to determine the best configuration  Prerequisites #   Kubernetes cluster ( minikube cluster will be sufficient ) kubectl properly configured for your cluster redskyctl kustomize v3.1.0&#43;  Initialize the Red Sky Ops Manager #  Log in to your Red Sky Ops account:">
+<meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="http://example.org/docs/quickstart/postgres/" />
+
+<title>Postgres | My New Hugo Site</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+<link rel="stylesheet" href="/book.min.6cd8553a6854f4812343f0f0c8baca31271e686434f381fbe3c7226f66639176.css" integrity="sha256-bNhVOmhU9IEjQ/DwyLrKMSceaGQ084H748cib2ZjkXY=">
+<script defer src="/en.search.min.da8377ee327f30cfef1c7e15800e15280922b498e77052a184556492e97868ae.js" integrity="sha256-2oN37jJ/MM/vHH4VgA4VKAkitJjncFKhhFVkkul4aK4="></script>
+<link rel="alternate" type="application/rss+xml" href="http://example.org/docs/quickstart/postgres/index.xml" title="My New Hugo Site" />
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body dir=>
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/"><span>My New Hugo Site</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/docs/quickstart/">Quickstart</a>
+<ul>
+<li><a href="/docs/quickstart/postgres/"class=active>Postgres</a></li>
+<li><a href="/docs/quickstart/voting-app/">Voting App</a></li>
+</ul>
+</li>
+<li><a href="/docs/prerequisites/">Prerequisites</a></li>
+<li><a href="/docs/concepts/">Concepts</a>
+<ul>
+<li><a href="/docs/concepts/experiment/">Experiment</a></li>
+<li><a href="/docs/concepts/trial/">Trial</a></li>
+</ul>
+</li>
+<li><a href="">Resources</a>
+<ul>
+<li>v1alpha1
+<ul>
+<li><a href="/docs/resources/v1alpha1/experiment/">Experiment</a></li>
+<li><a href="/docs/resources/v1alpha1/trial/">Trial</a></li>
+</ul>
+</li>
+<li>v1beta1
+<ul>
+<li><a href="/docs/resources/v1beta1/experiment/">Experiment</a></li>
+<li><a href="/docs/resources/v1beta1/trial/">Trial</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/docs/cli/">CLI</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Postgres</strong>
+
+  <label for="toc-control">
+    
+    <img src="/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#postgres">Postgres</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#initialize-the-red-sky-ops-manager">Initialize the Red Sky Ops Manager</a></li>
+        <li><a href="#create-the-experiment">Create the Experiment</a></li>
+        <li><a href="#removing-the-experiment">Removing the Experiment</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown"><h1 id="postgres">
+  Postgres
+  <a class="anchor" href="#postgres">#</a>
+</h1>
+<p>The purpose of this guide is to get you started with Red Sky Ops and Postgres.
+We will cover</p>
+<ul>
+<li>Deploying a postgres to Kubernetes</li>
+<li>Exploring the postgres experiment</li>
+<li>Running trials to determine the best configuration</li>
+</ul>
+<h2 id="prerequisites">
+  Prerequisites
+  <a class="anchor" href="#prerequisites">#</a>
+</h2>
+<ul>
+<li>Kubernetes cluster ( <a href="https://kubernetes.io/docs/setup/learning-environment/minikube/">minikube</a> cluster will be sufficient )</li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">kubectl</a> properly configured for your cluster</li>
+<li><a href="https://github.com/redskyops/redskyops-controller/releases/latest">redskyctl</a></li>
+<li><a href="https://github.com/kubernetes-sigs/kustomize/releases/">kustomize</a> v3.1.0+</li>
+</ul>
+<h2 id="initialize-the-red-sky-ops-manager">
+  Initialize the Red Sky Ops Manager
+  <a class="anchor" href="#initialize-the-red-sky-ops-manager">#</a>
+</h2>
+<p>Log in to your Red Sky Ops account:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ redskyctl login
+Opening your default browser to visit:
+
+	https://auth.carbonrelay.io/authorize?audience<span style="color:#f92672">=</span>https%3A%2F%2Fapi.carbonrelay.io%2Fv1%2F&amp;client_id<span style="color:#f92672">=</span>QJHVshlUUQJ40Rml7CUJDJVmRLHhE04Y&amp;code_challenge<span style="color:#f92672">=</span>5JstkywCbFCwSC4qarX8WC_Uq_6ktsn1g28aY7ZtTDs&amp;code_challenge_method<span style="color:#f92672">=</span>S256&amp;redirect_uri<span style="color:#f92672">=</span>http%3A%2F%2F127.0.0.1%3A8085%2F&amp;response_type<span style="color:#f92672">=</span>code&amp;scope<span style="color:#f92672">=</span>register%3Aclients+offline_access&amp;state<span style="color:#f92672">=</span>S-t7HVXShlUUSel6KAWMIQ
+
+You are now logged in.
+</code></pre></div><p>Initialize the manager in your cluster:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ redskyctl init
+namespace/redsky-system created
+customresourcedefinition.apiextensions.k8s.io/experiments.redskyops.dev created
+customresourcedefinition.apiextensions.k8s.io/trials.redskyops.dev created
+clusterrole.rbac.authorization.k8s.io/redsky-manager-role created
+clusterrolebinding.rbac.authorization.k8s.io/redsky-manager-rolebinding created
+deployment.apps/redsky-controller-manager created
+clusterrole.rbac.authorization.k8s.io/redsky-patching-role created
+clusterrolebinding.rbac.authorization.k8s.io/redsky-patching-rolebinding created
+secret/redsky-manager created
+</code></pre></div><p>Verify manager is running:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ kubectl wait --for condition<span style="color:#f92672">=</span>Ready<span style="color:#f92672">=</span>true po -n redsky-system -l app.kubernetes.io/name<span style="color:#f92672">=</span>redskyops
+pod/redsky-controller-manager-5fb9f4cd4d-g2rn5 condition met
+</code></pre></div><h2 id="create-the-experiment">
+  Create the Experiment
+  <a class="anchor" href="#create-the-experiment">#</a>
+</h2>
+<p>We&rsquo;ll use the Postgres example <a href="https://github.com/redskyops/redskyops-recipes/tree/master/postgres">here</a>.
+This example will deploy the postgres application and configure an experiment to tune the memory and cpu limits for postgres.
+This is done by running trials using <code>pgbench</code> to generate load against our postgres instance.
+Each trial will test a different set of parameters provided by the Red Sky Ops ML servers.
+The effectiveness of each trial is gauged by the metrics, in this case we contrast cost versus duration.</p>
+<p>Deploy the postgres application and experiment using the following:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ kustomize build github.com/redskyops/redskyops-recipes/postgres | kubectl apply -f -
+<span style="color:#75715e"># TODO show sample output</span>
+</code></pre></div><p>You can monitor the progress using <code>kubectl</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ watch -d kubectl get trials -o wide
+<span style="color:#75715e"># TODO show sample output</span>
+</code></pre></div><p>After the trial is complete, you will be able to view the parameters and the metrics generated from the trial.
+The results can be reviewed as a visualization by running the following command:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ redskyctl results
+</code></pre></div><h2 id="removing-the-experiment">
+  Removing the Experiment
+  <a class="anchor" href="#removing-the-experiment">#</a>
+</h2>
+<p>To clean up the data from your experiment, simply delete the experiment. The delete will cascade to the associated trials and other Kubernetes objects:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ kubectl delete experiment postgres-example
+</code></pre></div><p>Congratulations! You just ran your first experiment. You can move on to a more <a href="tutorial.md">advanced tutorial</a> or browse the rest of the documentation to learn more about the Red Sky Ops Kubernetes experimentation product.</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#postgres">Postgres</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#initialize-the-red-sky-ops-manager">Initialize the Red Sky Ops Manager</a></li>
+        <li><a href="#create-the-experiment">Create the Experiment</a></li>
+        <li><a href="#removing-the-experiment">Removing the Experiment</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

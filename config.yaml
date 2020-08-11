@@ -2,3 +2,15 @@ baseURL: "http://example.org/"
 languageCode: "en-us"
 title: "My New Hugo Site"
 theme: book
+enableGitInfo: true
+# Needed for mermaid/katex shortcodes
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  tableOfContents:
+    startLevel: 1
+
+params:
+  BookToC: true
+  BookMenuBundle: /menu

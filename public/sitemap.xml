@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://example.org/docs/cli/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/concepts/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/concepts/experiment/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/concepts/trial/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/prerequisites/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/quickstart/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/quickstart/postgres/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/quickstart/voting-app/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/resources/v1alpha1/experiment/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/resources/v1alpha1/trial/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/resources/v1beta1/experiment/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/resources/v1beta1/trial/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/docs/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/</loc>
+  </url>
+  
+  <url>
+    <loc>http://example.org/tags/</loc>
+  </url>
+  
+</urlset>
