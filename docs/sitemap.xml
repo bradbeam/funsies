@@ -4,50 +4,62 @@
   
   <url>
     <loc>http://example.org/docs/cli/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/concepts/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/concepts/experiment/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/concepts/trial/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/prerequisites/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/quickstart/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/quickstart/postgres/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/quickstart/voting-app/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/resources/v1alpha1/experiment/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/resources/v1alpha1/trial/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/resources/v1beta1/experiment/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/docs/resources/v1beta1/trial/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
@@ -56,10 +68,12 @@
   
   <url>
     <loc>http://example.org/docs/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://example.org/</loc>
+    <lastmod>2020-08-11T12:37:03-05:00</lastmod>
   </url>
   
   <url>
