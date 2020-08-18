@@ -31,8 +31,9 @@ When you initialize your cluster for Red Sky Ops, the following resources will b
 - `redsky-system` namespace
 - `experiment` and `trial` custom resource definitions
 - `ClusterRole` and `ClusterRoleBinding` for the controller service account
-- controller deployment
+- `redsky-controller-manager` deployment
 - an authorization secret for the controller
+
 Initialize your cluster with the following command:
 
 ```sh
