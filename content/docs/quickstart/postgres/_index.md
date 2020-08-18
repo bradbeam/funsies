@@ -51,7 +51,9 @@ secret/redsky-manager created
 Verify manager is running:
 
 ```sh
-$ kubectl wait --for condition=Ready=true po -n redsky-system -l app.kubernetes.io/name=redskyops
+$ kubectl wait --for condition=Ready=true po \
+  -n redsky-system \
+  -l app.kubernetes.io/name=redskyops
 pod/redsky-controller-manager-5fb9f4cd4d-g2rn5 condition met
 ```
 
@@ -65,7 +67,8 @@ The effectiveness of each trial is gauged by the metrics, in this case we contra
 
 Deploy the postgres application and experiment using the following:
 ```sh
-$ kustomize build github.com/redskyops/redskyops-recipes/postgres | kubectl apply -f -
+$ kustomize build github.com/redskyops/redskyops-recipes/postgres | \
+  kubectl apply -f -
 secret/postgres-secret created
 service/postgres created
 deployment.apps/postgres created
@@ -111,7 +114,8 @@ There is a filter on the upper right hand side where you can display trials that
 To clean up the data from your experiment, simply delete the experiment. The delete will cascade to the associated trials and other Kubernetes objects:
 
 ```sh
-$ kustomize build github.com/redskyops/redskyops-recipes/postgres | kubectl delete -f -
+$ kustomize build github.com/redskyops/redskyops-recipes/postgres | \
+  kubectl delete -f -
 secret/postgres-secret deleted
 service/postgres deleted
 deployment.apps/postgres deleted
