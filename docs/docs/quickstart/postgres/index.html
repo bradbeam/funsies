@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Postgres #  The purpose of this guide is to get you started with Red Sky Ops and Postgres. We will cover
- Deploying a postgres to Kubernetes Exploring the postgres experiment Running trials to determine the best configuration  Prerequisites #   Kubernetes cluster ( minikube cluster will be sufficient ) kubectl properly configured for your cluster redskyctl kustomize v3.1.0&#43;  Initialize the Red Sky Ops Manager #  Log in to your Red Sky Ops account:">
+ Deploying a postgres to Kubernetes Exploring the postgres experiment Running trials to determine the best configuration  Prerequisites #   Kubernetes cluster  A typical minikube cluster will be sufficient. The experiment may consume up to 4vcpu and 4GB memory   kubectl properly configured for your cluster redskyctl kustomize v3.">
 <meta name="theme-color" content="#FFFFFF"><meta property="og:title" content="" />
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
@@ -15,7 +15,7 @@
 <link rel="manifest" href="/funsies/manifest.json">
 <link rel="icon" href="/funsies/favicon.png" type="image/x-icon">
 <link rel="stylesheet" href="/funsies/book.min.6cd8553a6854f4812343f0f0c8baca31271e686434f381fbe3c7226f66639176.css" integrity="sha256-bNhVOmhU9IEjQ/DwyLrKMSceaGQ084H748cib2ZjkXY=">
-<script defer src="/funsies/en.search.min.59be8054eedfcc867e802e51ce749e3c2e176bb14053a6eb29f3b8ef9ad98c78.js" integrity="sha256-Wb6AVO7fzIZ&#43;gC5RznSePC4Xa7FAU6brKfO475rZjHg="></script>
+<script defer src="/funsies/en.search.min.20919d6e13cbe689f72f505e566b1871453d6f50c2e8ba146cde4e72489f6791.js" integrity="sha256-IJGdbhPL5on3L1BeVmsYcUU9b1DC6LoUbN5OckifZ5E="></script>
 <link rel="alternate" type="application/rss+xml" href="https://bradbeam.github.io/funsies/docs/quickstart/postgres/index.xml" title="My New Hugo Site" />
 <!--
 Made with Book Theme
@@ -165,10 +165,15 @@ We will cover</p>
   <a class="anchor" href="#prerequisites">#</a>
 </h2>
 <ul>
-<li>Kubernetes cluster ( <a href="https://kubernetes.io/docs/setup/learning-environment/minikube/">minikube</a> cluster will be sufficient )</li>
+<li>Kubernetes cluster
+<ul>
+<li>A typical <a href="https://kubernetes.io/docs/setup/learning-environment/minikube/">minikube</a> cluster will be sufficient. The experiment may consume up to 4vcpu and 4GB memory</li>
+</ul>
+</li>
 <li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">kubectl</a> properly configured for your cluster</li>
 <li><a href="https://github.com/redskyops/redskyops-controller/releases/latest">redskyctl</a></li>
 <li><a href="https://github.com/kubernetes-sigs/kustomize/releases/">kustomize</a> v3.1.0+</li>
+<li><a href="https://app.carbonrelay.io">Red Sky Ops Account</a></li>
 </ul>
 <h2 id="initialize-the-red-sky-ops-manager">
   Initialize the Red Sky Ops Manager
@@ -178,11 +183,19 @@ We will cover</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ redskyctl login
 Opening your default browser to visit:
 
-	https://auth.carbonrelay.io/authorize?audience<span style="color:#f92672">=</span>https%3A%2F%2Fapi.carbonrelay.io%2Fv1%2F&amp;client_id<span style="color:#f92672">=</span>QJHVshlUUQJ40Rml7CUJDJVmRLHhE04Y&amp;code_challenge<span style="color:#f92672">=</span>5JstkywCbFCwSC4qarX8WC_Uq_6ktsn1g28aY7ZtTDs&amp;code_challenge_method<span style="color:#f92672">=</span>S256&amp;redirect_uri<span style="color:#f92672">=</span>http%3A%2F%2F127.0.0.1%3A8085%2F&amp;response_type<span style="color:#f92672">=</span>code&amp;scope<span style="color:#f92672">=</span>register%3Aclients+offline_access&amp;state<span style="color:#f92672">=</span>S-t7HVXShlUUSel6KAWMIQ
+	https://auth.carbonrelay.io/authorize?...
 
 You are now logged in.
-</code></pre></div><p>Initialize the manager in your cluster:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ redskyctl init
+</code></pre></div><p>When you initialize your cluster for Red Sky Ops, the following resources will be created:</p>
+<ul>
+<li><code>redsky-system</code> namespace</li>
+<li><code>experiment</code> and <code>trial</code> custom resource definitions</li>
+<li><code>ClusterRole</code> and <code>ClusterRoleBinding</code> for the controller service account</li>
+<li>controller deployment</li>
+<li>an authorization secret for the controller
+Initialize your cluster with the following command:</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ redskyctl init --wait
 namespace/redsky-system created
 customresourcedefinition.apiextensions.k8s.io/experiments.redskyops.dev created
 customresourcedefinition.apiextensions.k8s.io/trials.redskyops.dev created
@@ -201,25 +214,50 @@ pod/redsky-controller-manager-5fb9f4cd4d-g2rn5 condition met
 </h2>
 <p>We&rsquo;ll use the Postgres example <a href="https://github.com/redskyops/redskyops-recipes/tree/master/postgres">here</a>.
 This example will deploy the postgres application and configure an experiment to tune the memory and cpu limits for postgres.
-This is done by running trials using <code>pgbench</code> to generate load against our postgres instance.
-Each trial will test a different set of parameters provided by the Red Sky Ops ML servers.
+The controller will schedule trials ( Kubernetes jobs ) using <code>pgbench</code> to generate load against our postgres instance.
+Each trial will test a different set of parameters provided by the Red Sky Ops machine learning(ML) servers.
 The effectiveness of each trial is gauged by the metrics, in this case we contrast cost versus duration.</p>
 <p>Deploy the postgres application and experiment using the following:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ kustomize build github.com/redskyops/redskyops-recipes/postgres | kubectl apply -f -
-<span style="color:#75715e"># TODO show sample output</span>
+secret/postgres-secret created
+service/postgres created
+deployment.apps/postgres created
+experiment.redskyops.dev/postgres-example created
 </code></pre></div><p>You can monitor the progress using <code>kubectl</code>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ watch -d kubectl get trials -o wide
-<span style="color:#75715e"># TODO show sample output</span>
-</code></pre></div><p>After the trial is complete, you will be able to view the parameters and the metrics generated from the trial.
+Every 2.0s: kubectl get trial -o wide
+
+NAME                        STATUS      ASSIGNMENTS             VALUES
+postgres-example-000   Completed   cpu<span style="color:#f92672">=</span>1319, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">1457</span>   duration<span style="color:#f92672">=</span>7, cost<span style="color:#f92672">=</span><span style="color:#ae81ff">33</span>
+postgres-example-001   Completed   cpu<span style="color:#f92672">=</span>963, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">2647</span>    duration<span style="color:#f92672">=</span>5, cost<span style="color:#f92672">=</span><span style="color:#ae81ff">29</span>
+postgres-example-002   Completed   cpu<span style="color:#f92672">=</span>2394, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">1934</span>   duration<span style="color:#f92672">=</span>5, cost<span style="color:#f92672">=</span><span style="color:#ae81ff">58</span>
+postgres-example-003   Completed   cpu<span style="color:#f92672">=</span>3508, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">2654</span>   duration<span style="color:#f92672">=</span>6, cost<span style="color:#f92672">=</span><span style="color:#ae81ff">85</span>
+postgres-example-004   Completed   cpu<span style="color:#f92672">=</span>3410, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">1019</span>   duration<span style="color:#f92672">=</span>5, cost<span style="color:#f92672">=</span><span style="color:#ae81ff">78</span>
+postgres-example-005   Completed   cpu<span style="color:#f92672">=</span>2757, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">2538</span>   duration<span style="color:#f92672">=</span>4, cost<span style="color:#f92672">=</span><span style="color:#ae81ff">68</span>
+postgres-example-006   Completed   cpu<span style="color:#f92672">=</span>983, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">3057</span>    duration<span style="color:#f92672">=</span>6, cost<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>
+postgres-example-007   Completed   cpu<span style="color:#f92672">=</span>373, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">3065</span>    duration<span style="color:#f92672">=</span>15, cost<span style="color:#f92672">=</span><span style="color:#ae81ff">17</span>
+postgres-example-008   Waiting     cpu<span style="color:#f92672">=</span>1198, memory<span style="color:#f92672">=</span><span style="color:#ae81ff">2701</span>
+</code></pre></div><p>The trials will run until the <code>experimentBudget</code> is satisfied. In this example, there will be 40 trials that run.
+While the trial is running, there may be assignment combinations that are unstable and result in a failure.</p>
+<p>After the trial is complete, you will be able to view the parameters and the metrics generated from the trial.
 The results can be reviewed as a visualization by running the following command:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ redskyctl results
-</code></pre></div><h2 id="removing-the-experiment">
+</code></pre></div><p>This should open a link in your browser showing a graph similar to the below.
+<img src="redskyresults.png" alt="redskyctl results" /></p>
+<p>This is where you can review the trials that have taken place and decide which parameter makes the most appropriate trade-off.
+There is a filter on the upper right hand side where you can display trials that were labeled <code>best</code> to better narrow down your results.</p>
+<h2 id="removing-the-experiment">
   Removing the Experiment
   <a class="anchor" href="#removing-the-experiment">#</a>
 </h2>
 <p>To clean up the data from your experiment, simply delete the experiment. The delete will cascade to the associated trials and other Kubernetes objects:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ kubectl delete experiment postgres-example
-</code></pre></div><p>Congratulations! You just ran your first experiment. You can move on to a more <a href="tutorial.md">advanced tutorial</a> or browse the rest of the documentation to learn more about the Red Sky Ops Kubernetes experimentation product.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ kustomize build github.com/redskyops/redskyops-recipes/postgres | kubectl delete -f -
+secret/postgres-secret deleted
+service/postgres deleted
+deployment.apps/postgres deleted
+experiment.redskyops.dev/postgres-example deleted
+</code></pre></div><p>Congratulations! You just ran your first experiment.
+Now that you&rsquo;ve got an idea of the basics, you can learn more about designing an experiment here.</p>
 </article>
  
       
